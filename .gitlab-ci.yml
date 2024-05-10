@@ -4,9 +4,6 @@ stages:
 - release
 - deploy
 
-variables:
-  REGISTRY_CONTAINER: "730335487630.dkr.ecr.ap-southeast-1.amazonaws.com"
-
 job_prepare:
   stage: preparation
   script:
@@ -19,7 +16,8 @@ job_prepare:
 job_build:
   stage: build
   script:
-  - docker build -t ${REGISTRY_CONTAINER}/$CI_PROJECT_NAME:$CI_COMMIT_SHA .
+  - dBuild ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT}
+  # - docker build -t ${REGISTRY_CONTAINER}/$CI_PROJECT_NAME:$CI_COMMIT_SHA .
   # Run this job in a branch where a Dockerfile exists
   rules:
   - if: $CI_COMMIT_BRANCH
@@ -29,7 +27,8 @@ job_build:
 job_release:
   stage: release
   script:
-  - docker push ${REGISTRY_CONTAINER}/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+  # - docker push ${REGISTRY_CONTAINER}/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+  - dRelease ${CI_PROJECT_NAME} ${CI_COMMIT_SHA}
   # - |
   #   if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
   #     docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
@@ -40,4 +39,4 @@ job_release:
 job_deploy:
   stage: deploy
   script:
-  - echo "deploy to ec2"
+  - dDeploy
