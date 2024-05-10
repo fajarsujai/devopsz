@@ -4,6 +4,10 @@ stages:
 - release
 - deploy
 
+variables:
+  PORT: 8000
+
+
 job_prepare:
   stage: preparation
   script:
