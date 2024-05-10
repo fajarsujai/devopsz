@@ -43,4 +43,4 @@ job_release:
 job_deploy:
   stage: deploy
   script:
-  - zdDeploy
+  - zdDeploy ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT}
