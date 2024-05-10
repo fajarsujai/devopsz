@@ -1,7 +1,11 @@
 stages:
 - preparation
-- build_release
+- build
+- release
+- deploy
 
+variables:
+  REGISTRY_CONTAINER: "730335487630.dkr.ecr.ap-southeast-1.amazonaws.com"
 
 job_prepare:
   stage: preparation
@@ -11,26 +15,29 @@ job_prepare:
   - echo "Commit_id -> '$CI_COMMIT_SHA'"
   - echo "Coder -> $CI_COMMIT_AUTHOR"
   - echo "Description -> $CI_COMMIT_MESSAGE"
-  # - docker ps -a
-  # - aws --version
 
 job_build:
-  stage: build_release
-  # image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  stage: build
   script:
-  # - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
-  # - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
-  # - aws configure set region "${AWS_DEFAULT_REGION}"
-  # - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 730335487630.dkr.ecr.ap-southeast-1.amazonaws.com
-  - docker build -t 730335487630.dkr.ecr.ap-southeast-1.amazonaws.com/$CI_PROJECT_NAME:$CI_COMMIT_SHA .
-  - docker push 730335487630.dkr.ecr.ap-southeast-1.amazonaws.com/$CI_PROJECT_NAME:$CI_COMMIT_SHA
-  # - |
-  #   if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-  #     docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
-  #     docker push "$CI_REGISTRY_IMAGE:latest"
-  #   fi
+  - docker build -t ${REGISTRY_CONTAINER}/$CI_PROJECT_NAME:$CI_COMMIT_SHA .
   # Run this job in a branch where a Dockerfile exists
   rules:
   - if: $CI_COMMIT_BRANCH
     exists:
     - Dockerfile
+
+job_release:
+  stage: release
+  script:
+  - docker push ${REGISTRY_CONTAINER}/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+  # - |
+  #   if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+  #     docker tag "$DOCKER_IMAGE_NAME" "$CI_REGISTRY_IMAGE:latest"
+  #     docker push "$CI_REGISTRY_IMAGE:latest"
+  #   fi
+
+
+job_deploy:
+  stage: deploy
+  script:
+  - echo "deploy to ec2"

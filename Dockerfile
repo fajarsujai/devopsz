@@ -4,6 +4,11 @@
 # Golang builder stage
 FROM golang:1.20 as builder
 
+
+#Build-ARG
+ARG PORT
+#ARG PROJECT
+
 # Install git, SSL ca certificates, and timezone data
 RUN apt-get update && apt-get install -y git ca-certificates tzdata
 
@@ -26,16 +31,26 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /bin/app main.go
 # MAKE SMALL BINARY #
 #####################
 # Final stage: lightweight container
-FROM alpine:3.16
+FROM alpine:latest
+
+#Build-ARG
+ARG PORT
+#ARG PROJECT
 
 # Set the working directory
 WORKDIR /app
+
+
+#EXPOSE PORT
+EXPOSE ${PORT}
 
 # Copy necessary files from builder stage
 COPY --from=builder /bin/app /bin/app
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd /etc/passwd
-COPY .env /app/.env
+#COPY .env /app/.env
+
+#data extends
 COPY data/termsAndCondition/termsAndConditionIDN.txt /app/data/termsAndCondition/termsAndConditionIDN.txt
 COPY data/termsAndCondition/termsAndConditionEN.txt /app/data/termsAndCondition/termsAndConditionEN.txt
 
