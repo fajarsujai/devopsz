@@ -23,7 +23,7 @@ job_build_staging:
   - zdBuild ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT}
   # Run this job in a branch where a Dockerfile exists
   rules:
-  - if: '$CI_COMMIT_BRANCH == "staging"'
+  - if: '$CI_COMMIT_BRANCH == "main"'
   - if: $CI_COMMIT_BRANCH
     exists:
     - Dockerfile
@@ -45,7 +45,7 @@ job_release_staging:
   script:
   - zdRelease ${CI_PROJECT_NAME} ${CI_COMMIT_SHA}
   rules:
-  - if: '$CI_COMMIT_BRANCH == "staging"'
+  - if: '$CI_COMMIT_BRANCH == "main"'
 
 
 job_release_production:
@@ -61,7 +61,7 @@ job_deploy_staging:
   script:
   - zdDeploy ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT}
   rules:
-  - if: '$CI_COMMIT_BRANCH == "staging"'
+  - if: '$CI_COMMIT_BRANCH == "main"'
 
 job_deploy_production:
   stage: deploy
