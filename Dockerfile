@@ -6,7 +6,7 @@ FROM golang:1.20 as builder
 
 #BUILD-ARG
 ARG PORT
-#ARG PROJECT
+ARG PROJECT
 
 # Install git, SSL ca certificates, and timezone data
 RUN apt-get update && apt-get install -y git ca-certificates tzdata
@@ -24,7 +24,7 @@ COPY . .
 RUN if [ -f go.mod ]; then rm go.mod; fi && if [ -f go.sum ]; then rm go.sum; fi
 
 # Setup Golang Module and generated protoc
-RUN go mod init bpay.com/bpay-backend-verify-user
+RUN go mod init bpay.com/${PROJECT}
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
 RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 RUN export PATH="$PATH:$(go env GOPATH)/bin"
@@ -42,7 +42,7 @@ FROM alpine:3.16
 
 #Build-ARG
 ARG PORT
-#ARG PROJECT
+ARG PROJECT
 
 # Set the working directory
 WORKDIR /app
