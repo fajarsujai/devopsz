@@ -5,7 +5,8 @@ stages:
 - deploy
 
 variables:
-  PORT: 8000
+  PORT1: 8000
+  PORT2: 8001
 
 
 job_prepare:
@@ -20,7 +21,7 @@ job_prepare:
 job_build_staging:
   stage: build
   script:
-  - zdBuild ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT}
+  - zdBuild ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT1}
   # Run this job in a branch where a Dockerfile exists
   rules:
   - if: '$CI_COMMIT_BRANCH == "main"'
@@ -31,7 +32,7 @@ job_build_staging:
 job_build_production:
   stage: build
   script:
-  - zdBuild ${CI_PROJECT_NAME} ${CI_COMMIT_TAG} ${PORT}
+  - zdBuild ${CI_PROJECT_NAME} ${CI_COMMIT_TAG} ${PORT1}
   # Run this job in a branch where a Dockerfile exists
   rules:
   - if: '$CI_COMMIT_TAG != null'
@@ -59,14 +60,14 @@ job_release_production:
 job_deploy_staging:
   stage: deploy
   script:
-  - zdDeploy ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT}
+  - zdDeploy ${CI_PROJECT_NAME} ${CI_COMMIT_SHA} ${PORT1} ${PORT2}
   rules:
   - if: '$CI_COMMIT_BRANCH == "main"'
 
 job_deploy_production:
   stage: deploy
   script:
-  - zdDeploy ${CI_PROJECT_NAME} ${CI_COMMIT_TAG} ${PORT}
+  - zdDeploy ${CI_PROJECT_NAME} ${CI_COMMIT_TAG} ${PORT1} ${PORT2}
   rules:
   - if: '$CI_COMMIT_TAG != null'
 
